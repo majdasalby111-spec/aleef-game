@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ms. Majda AleefMagic – Alif Race</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", Arial, sans-serif;
+    background: linear-gradient(135deg, #7fd3ff, #ffe08a);
+    overflow: hidden;
+  }
+
+  #introVideo {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  #introVideo video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #welcome {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #7fd3ff, #ffe08a);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  #logo {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ff5ca8;
+    text-shadow: 2px 2px #fff;
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 15px 30px;
+    font-size: 22px;
+    border: none;
+    border-radius: 20px;
+    background: #ff5ca8;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px #d94a8f;
+  }
+
+  button:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px #d94a8f;
+  }
+
+  #game {
+    display: none;
+    padding: 20px;
+  }
+
+  #topBar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  #track {
+    position: relative;
+    background: #eaffff;
+    border-radius: 20px;
+    height: 200px;
+    padding: 20px;
+  }
+
+  .animal {
+    position: absolute;
+    left: 10px;
+    font-size: 48px;
+    transition: left 0.4s ease;
+  }
+
+  #penguin { top: 40px; }
+  #panda { top: 120px; }
+
+  #question {
+    margin-top: 20px;
+    font-size: 28px;
+    text-align: center;
+  }
+
+  #choices {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .choice {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 15px;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 4px #ccc;
+  }
+
+  .flash {
+    animation: flash 0.3s 3;
+  }
+
+  @keyframes flash {
+    0% { background: #ffb3b3; }
+    50% { background: #fff; }
+    100% { background: #ffb3b3; }
+  }
+</style>
+</head>
+
+<body>
+
+<div id="introVideo">
+  <video id="welcomeVid" autoplay muted playsinline>
+    <source src="intro.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div id="welcome">
+  <div id="logo">Ms. Majda AleefMagic</div>
+  <p style="font-size:22px;">Help the Penguin and the Panda race by finding the letter:</p>
+  <div style="font-size:60px;margin:10px;">أ</div>
+  <button onclick="startGame()">Start</button>
+</div>
+
+<div id="game">
+  <div id="topBar">
+    <div>Score: <span id="score">0</span></div>
+    <div>Visitors: <span id="visitors">1</span></div>
+  </div>
+
+  <div id="track">
+    <div id="penguin" class="animal">🐧</div>
+    <div id="panda" class="animal">🐼</div>
+  </div>
+
+  <div id="question">Where is the letter <b>أ</b> ?</div>
+  <div id="choices"></div>
+</div>
+
+<audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+
+<script>
+  const intro = document.getElementById('introVideo');
+  const welcome = document.getElementById('welcome');
+
+  document.getElementById('welcomeVid').addEventListener('ended', () => {
+    intro.style.display = 'none';
+    welcome.style.display = 'flex';
+  });
+
+  let score = 0;
+  let penguinPos = 10;
+  let pandaPos = 10;
+
+  const letters = ["أ", "ب", "ت", "ث"];
+
+  function startGame() {
+    welcome.style.display = "none";
+    document.getElementById("game").style.display = "block";
+    newRound();
+  }
+
+  function newRound() {
+    const choices = document.getElementById("choices");
+    choices.innerHTML = "";
+
+    const shuffled = [...letters].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach(l => {
+      const div = document.createElement("div");
+      div.className = "choice";
+      div.textContent = l;
+      div.onclick = () => checkAnswer(l, div);
+      choices.appendChild(div);
+    });
+  }
+
+  function checkAnswer(letter, el) {
+    if (letter === "أ") {
+      document.getElementById("correctSound").play();
+      score++;
+      document.getElementById("score").textContent = score;
+
+      if (score % 2 === 0) {
+        penguinPos += 40;
+        document.getElementById("penguin").style.left = penguinPos + "px";
+      } else {
+        pandaPos += 40;
+        document.getElementById("panda").style.left = pandaPos + "px";
+      }
+    } else {
+      document.getElementById("wrongSound").play();
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 900);
+    }
+    newRound();
+  }
+</script>
+
+</body>
+</html>
